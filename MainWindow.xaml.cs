@@ -1,8 +1,9 @@
 ﻿/*
- * Displaying clock, keep log and alarm when files not updated.
+ * Displaying clock, keep log
  * .NET48 x64
  * @jussivirkkala 
  * Transfer done checking for video file 
+ * 2026-05-06 v1.0.1 Creating .ini file
  * 2025-12-09 v1.0.0 Clock Log
  *
  */
@@ -13,6 +14,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading; // DispatcherTimer
 
 namespace Clock_Log
@@ -49,7 +51,7 @@ namespace Clock_Log
             Log( "Started\t" + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).Comments);
             Log( "Version\t" + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion );
             Log( "MachineName\t" + Environment.MachineName);
-          //  Log( "UserName\t" + Environment.UserName);
+          //  Log( "UserName\t" + Environment.UserName); // GDPR
             Log( "OS\t" + System.Runtime.InteropServices.RuntimeInformation.OSDescription );
             Log( "OSArchitecture\t" + System.Runtime.InteropServices.RuntimeInformation.OSArchitecture );
             Log( "ProcessArchitecture\t" + System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture );
@@ -60,7 +62,9 @@ namespace Clock_Log
             // Load ini file
             if (!File.Exists(appName + ".ini"))
             {
-                MessageBox.Show("Missing " + appName + ".ini with label, width rows. Using {0:HH:mm:ss} 120", appName);
+                MessageBox.Show("Missing " + appName + ".ini. Created with {0:HH:mm:ss} 120 White", appName);
+                using (StreamWriter sw = File.AppendText(appName + ".ini"))
+                    sw.WriteLine("{0:HH:mm:ss}\n120\nWhite");
             }
             else
             {
@@ -84,23 +88,53 @@ namespace Clock_Log
                                 Log("Clock format\t"+ sFormat);
                                 break;
                             case 2:
-                                Int16.TryParse(line, out iWidth1);
+                                if (Int16.TryParse(line, out iWidth1) && iWidth1 > 0)
+                                { 
                                 Log("Normal width\t"+iWidth1.ToString("0"));
                                 this.Width = iWidth1;
+                                }
                                 break;
+                            case 3:
+                                Color color = (Color)ColorConverter.ConvertFromString(line);
+                                this.Background = new SolidColorBrush(color);
+                                break;
+
                         }
                     }
                 }
 
             }
-
             DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick);
             dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
             dispatcherTimer1.Start();
             Log("Timer started");
-
         }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            base.OnKeyUp(e);
+
+            switch (e.Key)
+            {
+                case Key.Left:
+                    this.Width = Math.Max(this.Width - 10,10);
+                    break;
+
+                case Key.Right:
+                    this.Width = this.Width + 10;
+                    break;
+
+                case Key.Up:
+                    this.Height = Math.Max(this.Height- 10,10);
+                    break;
+
+                case Key.Down:
+                    this.Height = this.Height + 10;
+                    break;
+            }
+        }
+
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
