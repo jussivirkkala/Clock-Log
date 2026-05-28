@@ -104,7 +104,6 @@ namespace Clock_Log
             // Load ini file
             if (!File.Exists(appName + ".ini"))
             {
-                MessageBox.Show("Missing " + appName + ".ini. Created with {0:HH:mm:ss} White", appName);
                 using (StreamWriter sw = File.AppendText(appName + ".ini"))
                     sw.WriteLine("{0:HH:mm:ss}\nWhite");
             }
