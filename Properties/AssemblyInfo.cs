@@ -17,5 +17,5 @@ using System.Windows;
 )]
 
 // Assembly versioning
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("2026.05.28.0")]
+[assembly: AssemblyFileVersion("2026.05.28.0")]
