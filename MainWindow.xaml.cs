@@ -2,9 +2,9 @@
  * Displaying clock, keep log
  * .NET48 x64
  * @jussivirkkala 
- * Transfer done checking for video file 
- * 2026-05-06 v1.0.1 Creating .ini file
- * 2025-12-09 v1.0.0 Clock Log
+ * 2026-05-28 Reading .ini every 15 second.
+ * 2026-05-06 Creating .ini file
+ * 2025-12-09 Clock Log
  *
  */
 
