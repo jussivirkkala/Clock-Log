@@ -27,31 +27,78 @@ namespace Clock_Log
     {
         string appName= "";
         string sFormat = @"{0:HH:mm:ss}";
-        short iWidth1 = 120;
+       // short iWidth1 = 120;
 
       
         // Update clock
         string sError = "";
-        void dispatcherClock_Tick(object sender, EventArgs e)
+        
+        void dispatcherClock_Tick1(object sender, EventArgs e)
         {
             try
             {
-              Time.Content = String.Format(sFormat,DateTime.Now.AddMilliseconds(500));
+              Time.Content = String.Format(sFormat,DateTime.Now.AddMilliseconds(500), Environment.MachineName);
             }
             catch (Exception)
             {
                 Time.Content = ".ini error";
             }
-        }
+		}
+		void dispatcherClock_Tick2(object sender, EventArgs e)
+		{
+            try
+            {
+                int row = 0;
+                string s = appName + ".ini";
+                if (File.Exists(appName + "-" + Environment.MachineName + ".ini"))
+                    s = appName + "-" + Environment.MachineName + ".ini";
 
-        public MainWindow()
+                foreach (string line in File.ReadLines(s))
+                {
+                    if (!line.StartsWith("#"))
+                    {
+                        row += 1;
+                        switch (row)
+                        {
+                            case 1:
+                                if (!line.Equals(sFormat))
+                                { 
+                                    sFormat = line;
+								    Time.Content = String.Format(sFormat, DateTime.Now.AddMilliseconds(500), Environment.MachineName);
+                                    this.UpdateLayout();
+                                    Time.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+								    this.Width = Time.DesiredSize.Width;
+                                    if (sFormat.Equals(""))
+                                        this.Visibility= Visibility.Hidden;
+                                    else
+										this.Visibility = Visibility.Visible;
+									Log("Format changed\t" + sFormat);
+								}
+								break;
+                            case 2:
+                                Color color = (Color)ColorConverter.ConvertFromString(line);
+                                this.Background = new SolidColorBrush(color);
+                                break;
+                        }
+                    }
+                    Time.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                    this.Width = Time.DesiredSize.Width;
+                }
+            }
+            catch (Exception)
+            {
+                Time.Content = "read error";
+            }
+		}
+
+
+		public MainWindow()
         {
             appName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
 
             Log( "Started\t" + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).Comments);
             Log( "Version\t" + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion );
             Log( "MachineName\t" + Environment.MachineName);
-          //  Log( "UserName\t" + Environment.UserName); // GDPR
             Log( "OS\t" + System.Runtime.InteropServices.RuntimeInformation.OSDescription );
             Log( "OSArchitecture\t" + System.Runtime.InteropServices.RuntimeInformation.OSArchitecture );
             Log( "ProcessArchitecture\t" + System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture );
@@ -62,22 +109,18 @@ namespace Clock_Log
             // Load ini file
             if (!File.Exists(appName + ".ini"))
             {
-                MessageBox.Show("Missing " + appName + ".ini. Created with {0:HH:mm:ss} 120 White", appName);
+                MessageBox.Show("Missing " + appName + ".ini. Created with {0:HH:mm:ss} White", appName);
                 using (StreamWriter sw = File.AppendText(appName + ".ini"))
-                    sw.WriteLine("{0:HH:mm:ss}\n120\nWhite");
+                    sw.WriteLine("{0:HH:mm:ss}\nWhite");
             }
-            else
-            {
-                int row = 0;
 
-                // 2020-12-01 Look for -computername.ini
+                int row = 0;
                 string s = appName + ".ini";
                 if (File.Exists(appName + "-" + Environment.MachineName + ".ini"))
                     s = appName + "-" + Environment.MachineName + ".ini";
 
-                foreach (string line1 in File.ReadLines(s))
+                foreach (string line in File.ReadLines(s))
                 {
-                    String line = line1.Trim(); 
                     if (!line.StartsWith("#"))
                     {
                         row += 1;
@@ -85,30 +128,37 @@ namespace Clock_Log
                         {
                             case 1:
                                 sFormat= line;
-                                Log("Clock format\t"+ sFormat);
-                                break;
+    							if (sFormat.Equals(""))
+	    							this.Visibility = Visibility.Hidden;
+		    					else
+			    					this.Visibility = Visibility.Visible;
+				    			Time.Content = String.Format(sFormat, DateTime.Now.AddMilliseconds(500), Environment.MachineName);
+								Time.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+								this.Width = Time.DesiredSize.Width;
+                                Log("Format\t"+ sFormat);
+
+							    break;
                             case 2:
-                                if (Int16.TryParse(line, out iWidth1) && iWidth1 > 0)
-                                { 
-                                Log("Normal width\t"+iWidth1.ToString("0"));
-                                this.Width = iWidth1;
-                                }
-                                break;
-                            case 3:
                                 Color color = (Color)ColorConverter.ConvertFromString(line);
                                 this.Background = new SolidColorBrush(color);
                                 break;
 
                         }
-                    }
-                }
+                        if (sFormat.Contains("{0"))
+                        {
+                            DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
+                            dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick1);
+                            dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
+                        }
+					}
+				
 
             }
-            DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick);
-            dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
-            dispatcherTimer1.Start();
-            Log("Timer started");
+			DispatcherTimer dispatcherTimer2 = new System.Windows.Threading.DispatcherTimer();
+			dispatcherTimer2.Tick += new EventHandler(dispatcherClock_Tick2);
+			dispatcherTimer2.Interval = new TimeSpan(0, 0, 0, 15, 0);
+			dispatcherTimer2.Start();
+			Log("Timer started");
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
