@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 [assembly: AssemblyTitle("Clock-Log")]
-[assembly: AssemblyDescription("Displaying cloc with startup log")]
+[assembly: AssemblyDescription("Displaying clock with log")]
 [assembly: AssemblyCompany("Jussi Virkkala")]
 [assembly: AssemblyProduct("Clock-Log")]
 [assembly: AssemblyTrademark("@jussivirkkala")]
@@ -19,3 +19,4 @@ using System.Windows;
 // Assembly versioning
 [assembly: AssemblyVersion("2026.05.28.0")]
 [assembly: AssemblyFileVersion("2026.05.28.0")]
+[assembly: AssemblyCopyright("@jussivirkkala")]

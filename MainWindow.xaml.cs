@@ -27,11 +27,6 @@ namespace Clock_Log
     {
         string appName= "";
         string sFormat = @"{0:HH:mm:ss}";
-       // short iWidth1 = 120;
-
-      
-        // Update clock
-        string sError = "";
         
         void dispatcherClock_Tick1(object sender, EventArgs e)
         {
