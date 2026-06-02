@@ -2,6 +2,7 @@
  * Displaying clock, keep log
  * .NET48 x64
  * @jussivirkkala 
+ * 2026-06-02 Adding OS build.
  * 2026-05-28 Reading .ini every 15 second.
  * 2026-05-06 Creating .ini file
  * 2025-12-09 Clock Log
@@ -16,6 +17,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading; // DispatcherTimer
+using Microsoft.Win32; // RegistryKey
 
 namespace Clock_Log
 {
@@ -67,7 +69,7 @@ namespace Clock_Log
                                         this.Visibility= Visibility.Hidden;
                                     else
 										this.Visibility = Visibility.Visible;
-									Log("Format changed\t" + sFormat);
+									Log("Format\t" + sFormat);
 								}
 								break;
                             case 2:
@@ -82,10 +84,15 @@ namespace Clock_Log
             }
             catch (Exception)
             {
-                Time.Content = "read error";
-            }
+                sFormat= "READ ERROR";
+                Time.Content = sFormat;
+				this.Visibility = Visibility.Visible;
+				Time.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+				this.Width = Time.DesiredSize.Width;
+			}
 		}
 
+       
 
 		public MainWindow()
         {
@@ -94,7 +101,10 @@ namespace Clock_Log
             Log( "Started\t" + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).Comments);
             Log( "Version\t" + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion );
             Log( "MachineName\t" + Environment.MachineName);
-            Log( "OS\t" + System.Runtime.InteropServices.RuntimeInformation.OSDescription );
+			RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+			var buildNumber = registryKey.GetValue("UBR").ToString();
+
+			Log( "OS\t" + System.Runtime.InteropServices.RuntimeInformation.OSDescription.Trim()+"."+ buildNumber.ToString());
             Log( "OSArchitecture\t" + System.Runtime.InteropServices.RuntimeInformation.OSArchitecture );
             Log( "ProcessArchitecture\t" + System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture );
             Log( "Framework\t" + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription );
@@ -143,8 +153,9 @@ namespace Clock_Log
                             DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
                             dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick1);
                             dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
-                        }
+					    	Log("Timer1 started");
 					}
+				}
 				
 
             }
@@ -152,7 +163,7 @@ namespace Clock_Log
 			dispatcherTimer2.Tick += new EventHandler(dispatcherClock_Tick2);
 			dispatcherTimer2.Interval = new TimeSpan(0, 0, 0, 15, 0);
 			dispatcherTimer2.Start();
-			Log("Timer started");
+			Log("Timer2 started");
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
