@@ -1,6 +1,6 @@
 # Clock
 
-## New faetures
+## New features
 
 Reading .ini every 15 s.
 
