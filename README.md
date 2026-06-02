@@ -2,8 +2,8 @@
 
 ## New faetures
 
-Reading .ini evwry 15 s.
+Reading .ini every 15 s.
 
 ## Breaking change 
 
-No width paramweter anymore.
+No width parameter anymore.
