@@ -148,17 +148,18 @@ namespace Clock_Log
                                 break;
 
                         }
-                        if (sFormat.Contains("{0"))
-                        {
-                            DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
-                            dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick1);
-                            dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
-					    	Log("Timer1 started");
-					}
-				}
+				    }
 				
+                }
 
-            }
+			if (sFormat.Contains("{0"))
+			{
+				DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
+				dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick1);
+				dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
+				Log("Timer1 started");
+			}
+
 			DispatcherTimer dispatcherTimer2 = new System.Windows.Threading.DispatcherTimer();
 			dispatcherTimer2.Tick += new EventHandler(dispatcherClock_Tick2);
 			dispatcherTimer2.Interval = new TimeSpan(0, 0, 0, 15, 0);
