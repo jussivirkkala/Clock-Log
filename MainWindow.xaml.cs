@@ -2,7 +2,7 @@
  * Clock-Log is a simple utility to display clock on top. Can be used to inform users or proding boxes for anonymization.
  * .NET48 x64
  * @jussivirkkala 
- * 2026-03-03 Corrected timer1.
+ * 2026-06-03 Corrected timer1.
  * 2026-06-02 Adding OS build.
  * 2026-05-28 Reading .ini every 15 second.
  * 2026-05-06 Creating .ini file
