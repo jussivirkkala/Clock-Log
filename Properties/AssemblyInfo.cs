@@ -17,6 +17,6 @@ using System.Windows;
 )]
 
 // Assembly versioning
-[assembly: AssemblyVersion("2026.06.02.0")]
-[assembly: AssemblyFileVersion("2026.06.02.0")]
+[assembly: AssemblyVersion("2026.06.03.0")]
+[assembly: AssemblyFileVersion("2026.06.03.0")]
 [assembly: AssemblyCopyright("@jussivirkkala")]
