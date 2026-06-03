@@ -1,7 +1,8 @@
 ﻿/*
- * Displaying clock, keep log
+ * Clock-Log is a simple utility to display clock on top. Can be used to inform users or proding boxes for anonymization.
  * .NET48 x64
  * @jussivirkkala 
+ * 2026-03-03 Corrected timer1.
  * 2026-06-02 Adding OS build.
  * 2026-05-28 Reading .ini every 15 second.
  * 2026-05-06 Creating .ini file
@@ -118,79 +119,72 @@ namespace Clock_Log
                     sw.WriteLine("{0:HH:mm:ss}\nWhite");
             }
 
-                int row = 0;
-                string s = appName + ".ini";
-                if (File.Exists(appName + "-" + Environment.MachineName + ".ini"))
-                    s = appName + "-" + Environment.MachineName + ".ini";
+            int row = 0;
+            string s = appName + ".ini";
+            if (File.Exists(appName + "-" + Environment.MachineName + ".ini"))
+            	s = appName + "-" + Environment.MachineName + ".ini";
 
-                foreach (string line in File.ReadLines(s))
+            foreach (string line in File.ReadLines(s))
+            {
+                if (!line.StartsWith("#"))
                 {
-                    if (!line.StartsWith("#"))
+                    row += 1;
+                    switch (row)
                     {
-                        row += 1;
-                        switch (row)
-                        {
-                            case 1:
-                                sFormat= line;
-    							if (sFormat.Equals(""))
-	    							this.Visibility = Visibility.Hidden;
-		    					else
-			    					this.Visibility = Visibility.Visible;
-				    			Time.Content = String.Format(sFormat, DateTime.Now.AddMilliseconds(500), Environment.MachineName);
-								Time.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
-								this.Width = Time.DesiredSize.Width;
-                                Log("Format\t"+ sFormat);
-
-							    break;
-                            case 2:
-                                Color color = (Color)ColorConverter.ConvertFromString(line);
-                                this.Background = new SolidColorBrush(color);
-                                break;
-
-                        }
-				    }
-				
-                }
+                        case 1:
+                            sFormat= line;
+    						if (sFormat.Equals(""))
+	    						this.Visibility = Visibility.Hidden;
+		    				else
+			    				this.Visibility = Visibility.Visible;
+				    		Time.Content = String.Format(sFormat, DateTime.Now.AddMilliseconds(500), Environment.MachineName);
+							Time.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+							this.Width = Time.DesiredSize.Width;
+                            Log("Format\t"+ sFormat);
+							break;
+                        case 2:
+                            Color color = (Color)ColorConverter.ConvertFromString(line);
+                            this.Background = new SolidColorBrush(color);
+                            break;
+                    }
+				}
+			}
 
 			if (sFormat.Contains("{0"))
 			{
 				DispatcherTimer dispatcherTimer1 = new System.Windows.Threading.DispatcherTimer();
 				dispatcherTimer1.Tick += new EventHandler(dispatcherClock_Tick1);
 				dispatcherTimer1.Interval = new TimeSpan(0, 0, 0, 0, 500);
-				Log("Timer1 started");
+				dispatcherTimer1.Start();
+				Log("Timer1 started 500 ms");
 			}
 
 			DispatcherTimer dispatcherTimer2 = new System.Windows.Threading.DispatcherTimer();
 			dispatcherTimer2.Tick += new EventHandler(dispatcherClock_Tick2);
 			dispatcherTimer2.Interval = new TimeSpan(0, 0, 0, 15, 0);
 			dispatcherTimer2.Start();
-			Log("Timer2 started");
+			Log("Timer2 started 15 s");
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
             base.OnKeyUp(e);
-
             switch (e.Key)
             {
                 case Key.Left:
                     this.Width = Math.Max(this.Width - 10,10);
                     break;
-
                 case Key.Right:
                     this.Width = this.Width + 10;
                     break;
-
                 case Key.Up:
                     this.Height = Math.Max(this.Height- 10,10);
                     break;
-
                 case Key.Down:
                     this.Height = this.Height + 10;
                     break;
             }
         }
-
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
